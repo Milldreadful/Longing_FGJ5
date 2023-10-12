@@ -5,62 +5,31 @@ using UnityEngine.AI;
 
 public class NPCScript : MonoBehaviour
 {
-    /*public float movementSpeed = 3f;
-    public float changeDirectionInterval = 2f;
-
-    private Vector3 targetPos;
-    private float timer;
-
-    private NavMeshAgent navMeshAgent;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        RandomizeDestaination();
-        navMeshAgent = GetComponent<NavMeshAgent>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, movementSpeed * Time.deltaTime);
-
-        if(Vector3.Distance(transform.position, targetPos) < 0.1f)
-        {
-            timer += Time.deltaTime;
-
-            if(timer >= changeDirectionInterval)
-            {
-                RandomizeDestaination();
-                timer = 0;
-            }
-        }
-    }
-
-    void RandomizeDestaination()
-    {
-        float newX = Random.Range(-50f, 50f);
-        float newZ = Random.Range(-50f, 50f);
-        targetPos = new Vector3(newX,transform.position.y, newZ);
-    }*/
-
     private NavMeshAgent navMeshAgent;
     public float changeDestinationInterval = 2.0f; // Time between changing destination
 
     private float timer;
-    public int maxHappiness = 20;
-    public int currentHappiness;
     public float npcRadius = 50f;
     public GameObject sadNobbin;
     public GameObject happyNobbin;
     public bool isHappy = true;
+    public float happinessTime;
+    public float happinessCounter;
 
-    public HappinessBarScript happinessBarScript;
+    public GameManager gm;
+    public AudioSource ghostHugAudio;
+    
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        happinessBarScript.UpdateHappiness(maxHappiness, currentHappiness);
         SetRandomDestination();
+
+        if(isHappy)
+        {
+            happinessTime = Random.Range(30f, 80f);
+            sadNobbin.SetActive(false);
+            happyNobbin.SetActive(true);
+        }
     }
 
     void Update()
@@ -75,6 +44,19 @@ public class NPCScript : MonoBehaviour
                 timer = 0;
             }
         }
+
+        if (isHappy)
+
+            happinessCounter += Time.deltaTime;
+            
+                if (happinessTime < happinessCounter)
+                {
+                    gm.AddSadness();
+                    isHappy = false;
+                    sadNobbin.SetActive(true);
+                    happyNobbin.SetActive(false);
+                    happinessCounter = 0;
+                }
     }
 
     void SetRandomDestination()
@@ -90,24 +72,18 @@ public class NPCScript : MonoBehaviour
         return hit.position;
     }
 
-    private void OnCollisionExit(Collision collision)
-    {
-        /*if (collision.gameObject.CompareTag("Player") && isHappy)
-        {
-            sadNobbin.SetActive(true);
-            happyNobbin.SetActive(false);
-            isHappy = false;
-            currentHappiness -= 5;
-        }*/
 
-        if (collision.gameObject.CompareTag("Player") && !isHappy)
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player") && !isHappy)
         {
+            ghostHugAudio.Play();
             sadNobbin.SetActive(false);
             happyNobbin.SetActive(true);
             isHappy = true;
-            currentHappiness -= 5;
-            happinessBarScript.UpdateHappiness(maxHappiness, currentHappiness);
-        }
+            gm.AddHappiness();
 
+            happinessTime = Random.Range(50f, 1200f);
+        }
     }
 }

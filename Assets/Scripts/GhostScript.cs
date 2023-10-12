@@ -20,29 +20,6 @@ public class GhostScript : MonoBehaviour
         ghostRb = GetComponent<Rigidbody>();
         cameraObject = Camera.main.transform;
     }
-
-    /*// Update is called once per frame
-    void Update()
-    {
-        float horizontal = Input.GetAxis("Horizontal");
-        float forward = Input.GetAxis("Vertical");
-
-        Vector3 movement = new Vector3 (horizontal, 0, forward);
-        movement.Normalize();
-
-        if (Input.GetButton("Vertical"))
-        {
-            ghostRb.velocity = transform.forward * forward * speed * Time.deltaTime;
-        }
-
-        /*transform.Translate(movement * magnitude * Time.deltaTime, Space.World);
-
-        if (movement != Vector3.zero)
-        {
-            //transform.forward = movement; snaps to direction at once
-            Quaternion toRotation = Quaternion.LookRotation(movement, Vector3.up);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
-        }*/
     
     public void HandleMovement()
     {
